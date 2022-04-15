@@ -1,6 +1,7 @@
 package security
 
 import (
+	"fmt"
 	"github.com/dottics/dutil"
 	"github.com/google/uuid"
 	"github.com/johannesscr/micro/microtest"
@@ -14,29 +15,29 @@ func TestService_Login(t *testing.T) {
 
 	// E denotes "Expected" as in statistics
 	type E struct {
-		token string
-		user User
+		token           string
+		user            User
 		permissionCodes PermissionCodes
-		e dutil.Err
+		e               dutil.Err
 	}
-	tt := []struct{
-		name string
-		payload io.Reader
+	tt := []struct {
+		name     string
+		payload  io.Reader
 		exchange *microtest.Exchange
-		E E
+		E        E
 	}{
 		{
-			name: "400 bad request",
+			name:    "400 bad request",
 			payload: strings.NewReader(`{"email":"tp@test.dottics.com","password":"password123"}`),
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
 					Status: 400,
-					Body: `{"message":"BadRequest: unable to process request","data":{},"errors":{"auth":["Invalid email or password"]}}`,
+					Body:   `{"message":"BadRequest: unable to process request","data":{},"errors":{"auth":["Invalid email or password"]}}`,
 				},
 			},
 			E: E{
-				token: "",
-				user: User{},
+				token:           "",
+				user:            User{},
 				permissionCodes: PermissionCodes{},
 				e: dutil.Err{
 					Status: 400,
@@ -51,12 +52,12 @@ func TestService_Login(t *testing.T) {
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
 					Status: 500,
-					Body: `{"message":"InternalServerError: unable to process request","data":{},"errors":{"internal_server_error":["some internal error"]}}`,
+					Body:   `{"message":"InternalServerError: unable to process request","data":{},"errors":{"internal_server_error":["some internal error"]}}`,
 				},
 			},
 			E: E{
-				token: "",
-				user: User{},
+				token:           "",
+				user:            User{},
 				permissionCodes: PermissionCodes{},
 				e: dutil.Err{
 					Status: 500,
@@ -67,7 +68,7 @@ func TestService_Login(t *testing.T) {
 			},
 		},
 		{
-			name: "200 successful login",
+			name:    "200 successful login",
 			payload: strings.NewReader(`{"email":"tp@test.dottics.com","password":"correct-password"}`),
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
@@ -90,7 +91,7 @@ func TestService_Login(t *testing.T) {
 					Active:             true,
 				},
 				permissionCodes: PermissionCodes{"abcd", "1234", "ab34"},
-				e: dutil.Err{},
+				e:               dutil.Err{},
 			},
 		},
 	}
@@ -100,7 +101,7 @@ func TestService_Login(t *testing.T) {
 	defer ms.Server.Close()
 
 	for _, tc := range tt {
-		t.Run(tc.name, func (t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			// add the new exchange to the micro-service
 			ms.Append(tc.exchange)
 			// test the login function
@@ -133,25 +134,25 @@ func TestService_Logout(t *testing.T) {
 	type E struct {
 		e dutil.Err
 	}
-	tt := []struct{
-		name string
-		payload io.Reader
+	tt := []struct {
+		name     string
+		payload  io.Reader
 		exchange *microtest.Exchange
-		E E
+		E        E
 	}{
 		{
 			name: "400 bad request",
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
 					Status: 401,
-					Body: `{"message":"Unauthorised: Unable to process request","data":{},"errors":{"auth":["Auth token required","Please login"]}}`,
+					Body:   `{"message":"Unauthorised: Unable to process request","data":{},"errors":{"auth":["Auth token required","Please login"]}}`,
 				},
 			},
 			E: E{
 				e: dutil.Err{
 					Status: 401,
 					Errors: map[string][]string{
-						"auth": {"Auth token required","Please login"},
+						"auth": {"Auth token required", "Please login"},
 					},
 				},
 			},
@@ -161,7 +162,7 @@ func TestService_Logout(t *testing.T) {
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
 					Status: 500,
-					Body: `{"message":"InternalServerError: Unable to process request","data":{},"errors":{"internal_server_error":["some internal server error"]}}`,
+					Body:   `{"message":"InternalServerError: Unable to process request","data":{},"errors":{"internal_server_error":["some internal server error"]}}`,
 				},
 			},
 			E: E{
@@ -178,7 +179,7 @@ func TestService_Logout(t *testing.T) {
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
 					Status: 200,
-					Body: `{"message":"logout successful","data":{},"errors":{}}`,
+					Body:   `{"message":"logout successful","data":{},"errors":{}}`,
 				},
 			},
 			E: E{
@@ -192,7 +193,7 @@ func TestService_Logout(t *testing.T) {
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
-	for _, tc := range tt  {
+	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			ms.Append(tc.exchange)
 
@@ -208,6 +209,76 @@ func TestService_Logout(t *testing.T) {
 				if e.Error() != tc.E.e.Error() {
 					t.Errorf("expected '%v' got '%v'", tc.E.e.Error(), e.Error())
 				}
+			}
+		})
+	}
+}
+
+func TestService_PasswordResetToken(t *testing.T) {
+	type E struct {
+		token string
+		e     dutil.Error
+	}
+	tests := []struct {
+		name     string
+		payload  PasswordResetTokenPayload
+		exchange *microtest.Exchange
+		E        E
+	}{
+		{
+			name: "bad request",
+			payload: PasswordResetTokenPayload{
+				Email: "i@dont.exist",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body:   `{"message":"password reset token successful","data":null,"errors":{"email":["required field"]}}`,
+				},
+			},
+			E: E{
+				token: "",
+				e: &dutil.Err{
+					Status: 400,
+					Errors: map[string][]string{
+						"email": {"required field"},
+					},
+				},
+			},
+		},
+		{
+			name: "successful",
+			payload: PasswordResetTokenPayload{
+				Email: "i@do.exist",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 200,
+					Body:   `{"message":"password reset token successful","data":{"password_reset_token":"f7c349f6-fbde-4241-871d-6a20827ef74e"},"errors":null}`,
+				},
+			},
+			E: E{
+				token: "f7c349f6-fbde-4241-871d-6a20827ef74e",
+				e:     nil,
+			},
+		},
+	}
+
+	s := NewService("")
+	ms := microtest.MockServer(s)
+	defer ms.Server.Close()
+
+	for i, tc := range tests {
+		ms.Append(tc.exchange)
+
+		name := fmt.Sprintf("%d %s", i, tc.name)
+		t.Run(name, func(t *testing.T) {
+			passResetToken, e := s.PasswordResetToken(tc.payload)
+			if !dutil.ErrorEqual(e, tc.E.e) {
+				t.Errorf("expected %v got %v", tc.E.e, e)
+			}
+			if passResetToken != tc.E.token {
+				t.Errorf("expected token %s got %s", tc.E.token, passResetToken)
 			}
 		})
 	}

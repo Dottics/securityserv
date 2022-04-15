@@ -23,10 +23,6 @@ func (s *Service) Login(payload io.Reader) (string, User, PermissionCodes, dutil
 	}{}
 
 	res, e := s.NewRequest("POST", s.URL.String(), nil, payload)
-	//xb, _ := ioutil.ReadAll(payload)
-	//xb, _ := ioutil.ReadAll(req.Body)
-	//log.Println("::1::", string(xb))
-	//_ = payload.Close()
 	if e != nil {
 		return "", User{}, nil, e
 	}
@@ -78,4 +74,44 @@ func (s *Service) Logout() dutil.Error {
 	}
 
 	return e
+}
+
+// PasswordResetToken makes and HTTP exchange to the security microservice
+// the body should contain the email of the user. The security service will
+// then return the password reset token otherwise an error.
+func (s *Service) PasswordResetToken(p PasswordResetTokenPayload) (string, dutil.Error) {
+	s.URL.Path = "/reset-password/token"
+
+	type data struct {
+		PasswordResetToken string `json:"password_reset_token"`
+	}
+	resp := struct {
+		Message string              `json:"message"`
+		Data    data                `json:"data"`
+		Errors  map[string][]string `json:"errors"`
+	}{}
+
+	payload, e := dutil.MarshalReader(p)
+	if e != nil {
+		return "", e
+	}
+
+	res, e := s.NewRequest("post", s.URL.String(), nil, payload)
+	if e != nil {
+		return "", e
+	}
+	_, e = s.decode(res, &resp)
+	if e != nil {
+		return "", e
+	}
+
+	if res.StatusCode != 200 {
+		e := &dutil.Err{
+			Status: res.StatusCode,
+			Errors: resp.Errors,
+		}
+		return "", e
+	}
+
+	return resp.Data.PasswordResetToken, nil
 }

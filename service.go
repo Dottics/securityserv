@@ -13,15 +13,14 @@ import (
 // service is the shorthand for the integration to the Security Micro-Service
 type Service struct {
 	Header http.Header
-	URL url.URL
+	URL    url.URL
 }
-
 
 func NewService(token string) *Service {
 	s := &Service{
 		URL: url.URL{
 			Scheme: os.Getenv("SECURITY_SERVICE_SCHEME"),
-			Host: os.Getenv("SECURITY_SERVICE_HOST"),
+			Host:   os.Getenv("SECURITY_SERVICE_HOST"),
 		},
 		Header: make(http.Header),
 	}
@@ -72,7 +71,6 @@ func (s *Service) NewRequest(method string, target string, headers map[string][]
 		req.Header.Set(key, values[0])
 	}
 	res, err := client.Do(req)
-	log.Println(err)
 	log.Printf("- security-service -> [ %v %v ] <- %d",
 		req.Method, req.URL.String(), res.StatusCode)
 	if err != nil {
