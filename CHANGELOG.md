@@ -5,6 +5,14 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.1.0] - 2022-04-15
+### Added
+- `PasswordResetToken` HTTP exchange function to get the password reset
+token from the security microservice.
+
+### Changed
+- updated the `dutil` package to `0.1.0`.
+
 ## [0.0.0] - 2022-04-15
 ### Added
 - Authentication functions such as `Login` and `Logout`.
