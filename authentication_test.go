@@ -283,3 +283,34 @@ func TestService_PasswordResetToken(t *testing.T) {
 		})
 	}
 }
+
+func TestService_ResetPassword(t *testing.T) {
+	tests := []struct {
+		// test input
+		name     string
+		payload  ResetPasswordPayload
+		exchange *microtest.Exchange
+		// expected output
+		e dutil.Error
+	}{
+		{},
+	}
+
+	s := NewService("")
+	ms := microtest.MockServer(s)
+	defer ms.Server.Close()
+
+	for i, tc := range tests {
+		name := fmt.Sprintf("%d %s", i, tc.name)
+		t.Run(name, func(t *testing.T) {
+			// add exchange
+			ms.Append(tc.exchange)
+			// reset password
+			e := s.ResetPassword(tc.payload)
+			// validate responses
+			if !dutil.ErrorEqual(e, tc.e) {
+				t.Errorf("expected error %v got %v", tc.e, e)
+			}
+		})
+	}
+}
