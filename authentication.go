@@ -115,3 +115,7 @@ func (s *Service) PasswordResetToken(p PasswordResetTokenPayload) (string, dutil
 
 	return resp.Data.PasswordResetToken, nil
 }
+
+func (s *Service) ResetPassword(p ResetPasswordPayload) dutil.Error {
+	return nil
+}
