@@ -117,5 +117,35 @@ func (s *Service) PasswordResetToken(p PasswordResetTokenPayload) (string, dutil
 }
 
 func (s *Service) ResetPassword(p ResetPasswordPayload) dutil.Error {
+	s.URL.Path = "/reset-password/reset"
+
+	resp := struct {
+		Message string              `json:"message"`
+		Data    interface{}         `json:"data"`
+		Errors  map[string][]string `json:"errors"`
+	}{}
+
+	payload, e := dutil.MarshalReader(p)
+	if e != nil {
+		return e
+	}
+
+	res, e := s.NewRequest("post", s.URL.String(), nil, payload)
+	if e != nil {
+		return e
+	}
+	_, e = s.decode(res, &resp)
+	if e != nil {
+		return e
+	}
+
+	if res.StatusCode != 200 {
+		e := &dutil.Err{
+			Status: res.StatusCode,
+			Errors: resp.Errors,
+		}
+		return e
+	}
+
 	return nil
 }

@@ -293,7 +293,62 @@ func TestService_ResetPassword(t *testing.T) {
 		// expected output
 		e dutil.Error
 	}{
-		{},
+
+		{
+			name: "decode error",
+			payload: ResetPasswordPayload{
+				Email:              "i@dont.exist",
+				PasswordResetToken: "f7c349f6-fbde-4241-871d-6a20827ef74e",
+				Password:           "password",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body:   `{"message":"BadRequest","data":null,"errors":{"user:["not found"]}}`,
+				},
+			},
+			e: &dutil.Err{
+				Status: 500,
+				Errors: map[string][]string{
+					"marshal": {"invalid character 'n' after object key"},
+				},
+			},
+		},
+		{
+			name: "bad request",
+			payload: ResetPasswordPayload{
+				Email:              "i@dont.exist",
+				PasswordResetToken: "f7c349f6-fbde-4241-871d-6a20827ef74e",
+				Password:           "password",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body:   `{"message":"BadRequest","data":null,"errors":{"user":["not found"]}}`,
+				},
+			},
+			e: &dutil.Err{
+				Status: 400,
+				Errors: map[string][]string{
+					"user": {"not found"},
+				},
+			},
+		},
+		{
+			name: "password reset successful",
+			payload: ResetPasswordPayload{
+				Email:              "i@do.exist",
+				PasswordResetToken: "f7c349f6-fbde-4241-871d-6a20827ef74e",
+				Password:           "password",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body:   `{"message":"password reset successful","data":null,"errors":null}`,
+				},
+			},
+			e: nil,
+		},
 	}
 
 	s := NewService("")
