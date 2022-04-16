@@ -5,6 +5,8 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [Released]
 ## [0.2.0] - 2022-04-16
 ### Added
 - `ResetPassword` HTTP exchange function to POST the new user password to
@@ -25,5 +27,4 @@ microservice.
 - Authentication functions such as `Login` and `Logout`.
 - Service module to be become a mock and testable service integration.
 - Models to be made available to the API Gateways.
-
-## [Released]
+- 
