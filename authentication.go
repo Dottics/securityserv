@@ -116,6 +116,8 @@ func (s *Service) PasswordResetToken(p PasswordResetTokenPayload) (string, dutil
 	return resp.Data.PasswordResetToken, nil
 }
 
+// ResetPassword handles the exchange with the security microservice to
+// reset a user's password.
 func (s *Service) ResetPassword(p ResetPasswordPayload) dutil.Error {
 	s.URL.Path = "/reset-password/reset"
 
@@ -147,5 +149,11 @@ func (s *Service) ResetPassword(p ResetPasswordPayload) dutil.Error {
 		return e
 	}
 
+	return nil
+}
+
+// RevokePasswordResetToken handles the exchange with the security
+// microservice to revoke a user's password reset token.
+func (s *Service) RevokePasswordResetToken() dutil.Error {
 	return nil
 }
