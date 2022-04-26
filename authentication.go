@@ -2,7 +2,9 @@ package security
 
 import (
 	"github.com/dottics/dutil"
+	"github.com/google/uuid"
 	"io"
+	"net/url"
 )
 
 // Login sends the payload to the micro-service. If the login is successful
@@ -154,6 +156,33 @@ func (s *Service) ResetPassword(p ResetPasswordPayload) dutil.Error {
 
 // RevokePasswordResetToken handles the exchange with the security
 // microservice to revoke a user's password reset token.
-func (s *Service) RevokePasswordResetToken() dutil.Error {
+func (s *Service) RevokePasswordResetToken(passwordResetToken uuid.UUID) dutil.Error {
+	s.URL.Path = "/revoke-password-reset-token"
+	qs := url.Values{}
+	qs.Add("password_reset_token", passwordResetToken.String())
+	s.URL.RawQuery = qs.Encode()
+
+	resp := struct {
+		Message string              `json:"message"`
+		Errors  map[string][]string `json:"errors"`
+	}{}
+
+	res, e := s.NewRequest("delete", s.URL.String(), nil, nil)
+	if e != nil {
+		return e
+	}
+	_, e = s.decode(res, &resp)
+	if e != nil {
+		return e
+	}
+
+	if res.StatusCode != 200 {
+		e := &dutil.Err{
+			Status: res.StatusCode,
+			Errors: resp.Errors,
+		}
+		return e
+	}
+
 	return nil
 }

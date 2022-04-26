@@ -369,3 +369,57 @@ func TestService_ResetPassword(t *testing.T) {
 		})
 	}
 }
+
+func TestService_RevokePasswordResetToken(t *testing.T) {
+	tests := []struct {
+		name               string
+		PasswordResetToken uuid.UUID
+		exchange           *microtest.Exchange
+		e                  dutil.Error
+	}{
+		{
+			name:               "bad request",
+			PasswordResetToken: uuid.MustParse("db3fb95d-f157-476c-b1cc-8637d98b5999"),
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 404,
+					Body:   `{"message":"BadRequest","data":{},"errors":{"user":["not found"]}}`,
+				},
+			},
+			e: &dutil.Err{
+				Status: 404,
+				Errors: map[string][]string{
+					"user": {"not found"},
+				},
+			},
+		},
+		{
+			name:               "revoke password reset token",
+			PasswordResetToken: uuid.MustParse("db3fb95d-f157-476c-b1cc-8637d98b5999"),
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 200,
+					Body:   `{"message":"revoke password reset token successful","data":{},"errors":{}}`,
+				},
+			},
+			e: nil,
+		},
+	}
+
+	s := NewService("")
+	ms := microtest.MockServer(s)
+	defer ms.Server.Close()
+
+	for i, tc := range tests {
+		name := fmt.Sprintf("%d %s", i, tc.name)
+		t.Run(name, func(t *testing.T) {
+			ms.Append(tc.exchange)
+
+			e := s.RevokePasswordResetToken(tc.PasswordResetToken)
+
+			if !dutil.ErrorEqual(e, tc.e) {
+				t.Errorf("expected error %v got %v", tc.e, e)
+			}
+		})
+	}
+}
