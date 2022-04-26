@@ -5,6 +5,8 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [Released]
 ## [0.3.0] - 2022-04-26
 ### Added
 - Method `RevokePasswordResetToken` to handle the exchange with the 
@@ -15,7 +17,6 @@ of a user's password if the user did not authorise the reset.
 - Moved the `models.go` to `type.go` as it better represents what it is 
 in Go.
 
-## [Released]
 ## [0.2.0] - 2022-04-16
 ### Added
 - `ResetPassword` HTTP exchange function to POST the new user password to
