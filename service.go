@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-// service is the shorthand for the integration to the Security Micro-Service
+// Service is the shorthand for the integration to the Security Micro-Service
 type Service struct {
 	Header http.Header
 	URL    url.URL
@@ -24,7 +24,7 @@ func NewService(token string) *Service {
 		},
 		Header: make(http.Header),
 	}
-	// default micro-service required headers
+	// default microservice required headers
 	(*s).Header.Set("Content-Type", "application/json")
 	(*s).Header.Set("X-User-Token", token)
 
