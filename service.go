@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-// service is the shorthand for the integration to the Security Micro-Service
+// Service is the shorthand for the integration to the Security Micro-Service
 type Service struct {
 	Header http.Header
 	URL    url.URL
@@ -32,7 +32,7 @@ func NewService(token string) *Service {
 }
 
 // SetURL sets the URL for the Security Micro-Service to point to
-// the micro-service. SetURL is also the interface function that makes it a
+// the microservice. SetURL is also the interface function that makes it a
 // mock service
 func (s *Service) SetURL(sc string, h string) {
 	s.URL.Scheme = sc

@@ -68,7 +68,7 @@ func TestService_Login(t *testing.T) {
 			},
 		},
 		{
-			name:    "200 successful login",
+			name:    "200 successful login with email",
 			payload: strings.NewReader(`{"email":"tp@test.dottics.com","password":"correct-password"}`),
 			exchange: &microtest.Exchange{
 				Response: microtest.Response{
@@ -76,16 +76,73 @@ func TestService_Login(t *testing.T) {
 					Header: map[string][]string{
 						"X-User-Token": {"some-long-jwt-encrypted-token"},
 					},
-					Body: `{"message":"login successful","data":{"user":{"uuid":"9b615709-cc9a-48c3-b1ea-a04d4375ea86","first_name":"james","last_name":"bond","active":true},"permission":["abcd", "1234", "ab34"]},"errors":{}}`,
+					Body: `{
+						"message":"login successful",
+						"data":{
+							"user":{
+								"uuid":"9b615709-cc9a-48c3-b1ea-a04d4375ea86",
+								"username":"tp",
+								"email":"tp@test.dottics.com",
+								"first_name":"james",
+								"last_name":"bond",
+								"active":true
+							},
+							"permission":["abcd", "1234", "ab34"]
+						},
+						"errors":{}
+					}`,
 				},
 			},
 			E: E{
 				token: "some-long-jwt-encrypted-token",
 				user: User{
 					UUID:               u,
+					Username:           "tp",
 					FirstName:          "james",
 					LastName:           "bond",
-					Email:              "",
+					Email:              "tp@test.dottics.com",
+					ContactNumber:      "",
+					PasswordResetToken: "",
+					Active:             true,
+				},
+				permissionCodes: PermissionCodes{"abcd", "1234", "ab34"},
+				e:               dutil.Err{},
+			},
+		},
+		{
+			name:    "200 successful login with username",
+			payload: strings.NewReader(`{"username":"tp","password":"correct-password"}`),
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 200,
+					Header: map[string][]string{
+						"X-User-Token": {"some-long-jwt-encrypted-token"},
+					},
+					Body: `{
+						"message":"login successful",
+						"data":{
+							"user":{
+								"uuid":"9b615709-cc9a-48c3-b1ea-a04d4375ea86",
+								"email":"tp@test.dottics.com",
+								"username":"tp",
+								"first_name":"james",
+								"last_name":"bond",
+								"active":true
+							},
+							"permission":["abcd", "1234", "ab34"]
+						},
+						"errors":{}
+					}`,
+				},
+			},
+			E: E{
+				token: "some-long-jwt-encrypted-token",
+				user: User{
+					UUID:               u,
+					Username:           "tp",
+					FirstName:          "james",
+					LastName:           "bond",
+					Email:              "tp@test.dottics.com",
 					ContactNumber:      "",
 					PasswordResetToken: "",
 					Active:             true,

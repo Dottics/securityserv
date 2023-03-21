@@ -5,6 +5,10 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.4.0] - 2023-03-21
+### Updated
+- The `User` type to also have a username.
+- The login method to accept both email and username fields for login.
 
 ## [Released]
 ## [0.3.0] - 2022-04-26
