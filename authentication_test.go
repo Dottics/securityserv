@@ -480,3 +480,126 @@ func TestService_RevokePasswordResetToken(t *testing.T) {
 		})
 	}
 }
+
+func TestService_Register(t *testing.T) {
+	tests := []struct {
+		name     string
+		payload  RegisterPayload
+		exchange *microtest.Exchange
+		user     User
+		e        dutil.Error
+	}{
+		{
+			name:    "payload validation error",
+			payload: RegisterPayload{},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body: `{
+						"message":"BadRequest",
+						"data":null,
+						"errors":{
+							"email":["required"],
+							"password":["required"]
+						}
+					}`,
+				},
+			},
+			user: User{},
+			e: &dutil.Err{
+				Status: 400,
+				Errors: map[string][]string{
+					"email":    {"required"},
+					"password": {"required"},
+				},
+			},
+		},
+		{
+			name:    "username already exists",
+			payload: RegisterPayload{},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body: `{
+						"message":"BadRequest",
+						"data":null,
+						"errors":{
+							"user":["username already exists"]
+						}
+					}`,
+				},
+			},
+			user: User{},
+			e: &dutil.Err{
+				Status: 400,
+				Errors: map[string][]string{
+					"user": {"username already exists"},
+				},
+			},
+		},
+		{
+			name: "register user",
+			payload: RegisterPayload{
+				Email:         "james.bond@mi6.gov.uk",
+				Password:      "Paassword123",
+				FirstName:     "James",
+				LastName:      "Bond",
+				ContactNumber: "01234567890",
+				Username:      "jamesbond",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 200,
+					Body: `{
+						"message":"register user successful",
+						"data":{	
+							"user":{
+								"uuid":"db3fb95d-f157-476c-b1cc-8637d98b5999",
+								"email":"james.bond@mi6.gov.uk",
+								"first_name":"James",
+								"last_name":"Bond",
+								"contact_number":"01234567890",	
+								"username":"jamesbond",
+								"active":true,
+								"create_date":"2020-02-23T13:01:00Z",
+								"updated_date":"2020-02-23T13:01:00Z"
+							}
+						},
+						"errors":{}
+					}`,
+				},
+			},
+			user: User{
+				UUID:               uuid.MustParse("db3fb95d-f157-476c-b1cc-8637d98b5999"),
+				Username:           "jamesbond",
+				FirstName:          "James",
+				LastName:           "Bond",
+				Email:              "james.bond@mi6.gov.uk",
+				ContactNumber:      "01234567890",
+				PasswordResetToken: "",
+				Active:             true,
+			},
+			e: nil,
+		},
+	}
+
+	s := NewService("")
+	ms := microtest.MockServer(s)
+	defer ms.Server.Close()
+
+	for i, tc := range tests {
+		name := fmt.Sprintf("%d %s", i, tc.name)
+		t.Run(name, func(t *testing.T) {
+			ms.Append(tc.exchange)
+
+			user, e := s.Register(tc.payload)
+
+			if !dutil.ErrorEqual(e, tc.e) {
+				t.Errorf("expected error %v got %v", tc.e, e)
+			}
+			if user != tc.user {
+				t.Errorf("expected user %v got %v", tc.user, user)
+			}
+		})
+	}
+}

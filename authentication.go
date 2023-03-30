@@ -186,3 +186,42 @@ func (s *Service) RevokePasswordResetToken(passwordResetToken uuid.UUID) dutil.E
 
 	return nil
 }
+
+// Register handles the exchange with the security microservice to register a
+// new user.
+func (s *Service) Register(p RegisterPayload) (User, dutil.Error) {
+	s.URL.Path = "/register"
+
+	type Data struct {
+		User User `json:"user"`
+	}
+	resp := struct {
+		Message string              `json:"message"`
+		Data    Data                `json:"data"`
+		Errors  map[string][]string `json:"errors"`
+	}{}
+
+	payload, e := dutil.MarshalReader(p)
+	if e != nil {
+		return User{}, e
+	}
+
+	res, e := s.NewRequest("post", s.URL.String(), nil, payload)
+	if e != nil {
+		return User{}, e
+	}
+	_, e = s.decode(res, &resp)
+	if e != nil {
+		return User{}, e
+	}
+
+	if res.StatusCode != 200 {
+		e := &dutil.Err{
+			Status: res.StatusCode,
+			Errors: resp.Errors,
+		}
+		return User{}, e
+	}
+
+	return resp.Data.User, nil
+}
