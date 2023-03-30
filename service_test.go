@@ -123,7 +123,7 @@ func TestService_SetEnv(t *testing.T) {
 }
 
 // TestService_NewRequest is to test that the service can make a
-// successful request to the micro-service.
+// successful request to the microservice.
 func TestService_NewRequest(t *testing.T) {
 	// test the request is made to the service
 	s := NewService("my test token")
@@ -184,7 +184,7 @@ func TestService_NewRequest(t *testing.T) {
 }
 
 // TestService_decode is to test that the service is able to successfully
-// decode any request from the micro-service.
+// decode any request from the microservice.
 func TestService_decode(t *testing.T) {
 	res := &http.Response{
 		Status:     http.StatusText(201),

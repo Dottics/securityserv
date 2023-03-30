@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-// Service is the shorthand for the integration to the Security Micro-Service
+// Service is the shorthand for the integration to the Security MicroService
 type Service struct {
 	Header http.Header
 	URL    url.URL
@@ -24,14 +24,14 @@ func NewService(token string) *Service {
 		},
 		Header: make(http.Header),
 	}
-	// default micro-service required headers
+	// default microservice required headers
 	(*s).Header.Set("Content-Type", "application/json")
 	(*s).Header.Set("X-User-Token", token)
 
 	return s
 }
 
-// SetURL sets the URL for the Security Micro-Service to point to
+// SetURL sets the URL for the Security MicroService to point to
 // the microservice. SetURL is also the interface function that makes it a
 // mock service
 func (s *Service) SetURL(sc string, h string) {
@@ -103,7 +103,7 @@ func (s *Service) decode(res *http.Response, v interface{}) ([]byte, dutil.Error
 	return xb, nil
 }
 
-// GetHome is a PING function to test connection to the Security Micro-Service
+// GetHome is a PING function to test connection to the Security MicroService
 // is healthy.
 func (s *Service) GetHome() (bool, dutil.Error) {
 	res, err := http.Get(s.URL.String())

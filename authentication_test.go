@@ -159,7 +159,7 @@ func TestService_Login(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			// add the new exchange to the micro-service
+			// add the new exchange to the microservice
 			ms.Append(tc.exchange)
 			// test the login function
 			token, u, xp, e := s.Login(tc.payload)

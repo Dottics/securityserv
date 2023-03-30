@@ -7,7 +7,7 @@ import (
 	"net/url"
 )
 
-// Login sends the payload to the micro-service. If the login is successful
+// Login sends the payload to the microservice. If the login is successful
 // a Redis session is created. And the user token is returned included in
 // the Headers Login parses the response and extracts the token, user data
 // and permissions codes.
@@ -45,7 +45,7 @@ func (s *Service) Login(payload io.Reader) (string, User, PermissionCodes, dutil
 	return "", User{}, nil, e
 }
 
-// Logout sends request to the micro-service, the header contains the user
+// Logout sends request to the microservice, the header contains the user
 // token of the user to be logged out. The security-service returns 200 if
 // request was successful.
 func (s *Service) Logout() dutil.Error {
