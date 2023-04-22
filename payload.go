@@ -23,3 +23,8 @@ type RegisterPayload struct {
 	ContactNumber string `json:"contact_number"`
 	Password      string `json:"password"`
 }
+
+type VerifyEmailPayload struct {
+	Email             string `json:"email"`
+	VerificationToken string `json:"verification_token"`
+}

@@ -5,6 +5,13 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.6.0] - 2023-04-22
+### Added
+- Added a `VerifyEmail` HTTP exchange method to verify a user's email address.
+  - The `email` field is required, and is the user's email.
+  - The `verification_token` field is required, and is the verification token
+    sent to the user's email address.
+
 ## [0.5.0] - 2023-03-30
 ### Added
 - `Register` HTTP exchange method to register a new user to the security
