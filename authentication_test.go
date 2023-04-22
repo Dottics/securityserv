@@ -603,3 +603,67 @@ func TestService_Register(t *testing.T) {
 		})
 	}
 }
+
+func TestService_VerifyEmail(t *testing.T) {
+	tests := []struct {
+		name     string
+		payload  *VerifyEmailPayload
+		exchange *microtest.Exchange
+		e        dutil.Error
+	}{
+		{
+			name: "bad request",
+			payload: &VerifyEmailPayload{
+				Email:             "dr.no@evil.co",
+				VerificationToken: "",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 400,
+					Body:   `{"message":"BadRequest","data":null,"errors":{"user":["not found"]}}`,
+				},
+			},
+			e: &dutil.Err{
+				Status: 400,
+				Errors: map[string][]string{
+					"user": {"not found"},
+				},
+			},
+		},
+		{
+			name: "verify email",
+			payload: &VerifyEmailPayload{
+				Email:             "james@bond.com",
+				VerificationToken: "890552de-b2ed-45b0-a10e-0f5bce4a1d2e",
+			},
+			exchange: &microtest.Exchange{
+				Response: microtest.Response{
+					Status: 200,
+					Body: `{
+							"message":"verify email successful",
+							"data":{},
+							"errors":{}
+						}`,
+				},
+			},
+			e: nil,
+		},
+	}
+
+	s := NewService("")
+	ms := microtest.MockServer(s)
+	defer ms.Server.Close()
+
+	for i, tc := range tests {
+		name := fmt.Sprintf("%d %s", i, tc.name)
+		t.Run(name, func(t *testing.T) {
+			ms.Append(tc.exchange)
+
+			e := s.VerifyEmail(tc.payload)
+
+			if !dutil.ErrorEqual(e, tc.e) {
+				t.Errorf("expected error %v got %v", tc.e, e)
+			}
+		})
+	}
+}

@@ -225,3 +225,43 @@ func (s *Service) Register(p RegisterPayload) (User, dutil.Error) {
 
 	return resp.Data.User, nil
 }
+
+// VerifyEmail handles the exchange with the security microservice to verify
+// a user's email.
+//
+// The payload should contain the email of the user and the verification token.
+// Where the verification token is the user's UUID.
+func (s *Service) VerifyEmail(p *VerifyEmailPayload) dutil.Error {
+	s.URL.Path = "/verify"
+
+	payload, e := dutil.MarshalReader(p)
+	if e != nil {
+		return e
+	}
+
+	res, e := s.NewRequest("PUT", s.URL.String(), nil, payload)
+	if e != nil {
+		return e
+	}
+
+	// handling the response
+	resp := struct {
+		Message string              `json:"message"`
+		Errors  map[string][]string `json:"errors"`
+	}{}
+
+	_, e = s.decode(res, &resp)
+	if e != nil {
+		return e
+	}
+
+	if res.StatusCode != 200 {
+		e := &dutil.Err{
+			Status: res.StatusCode,
+			Errors: resp.Errors,
+		}
+		return e
+	}
+
+	return nil
+}
