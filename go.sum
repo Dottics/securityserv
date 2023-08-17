@@ -5,3 +5,5 @@ github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/johannesscr/micro v0.1.1 h1:iY/sOXqj/BPKGEsSIgTfbkoW4AiUdpIQgx6fcDWwTRM=
 github.com/johannesscr/micro v0.1.1/go.mod h1:6iueg8ffr1CTH5sS30RKZvtYhY/3hXZRFAUGgiANUL4=
+github.com/johannesscr/micro v0.2.0 h1:dBpelqfPzjMrV9V0AtUf57oIsERUAFC7ukiPQwE3ze4=
+github.com/johannesscr/micro v0.2.0/go.mod h1:6iueg8ffr1CTH5sS30RKZvtYhY/3hXZRFAUGgiANUL4=

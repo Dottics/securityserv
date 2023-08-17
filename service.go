@@ -3,56 +3,36 @@ package security
 import (
 	"encoding/json"
 	"github.com/dottics/dutil"
+	"github.com/johannesscr/micro/msp"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 // Service is the shorthand for the integration to the Security MicroService
 type Service struct {
-	Header http.Header
-	URL    url.URL
+	msp.Service
 }
 
-func NewService(token string) *Service {
+type Config struct {
+	UserToken string
+	// APIKey    string // for now we will not allow this usage
+	Header http.Header
+	Values url.Values
+}
+
+func NewService(config Config) *Service {
 	s := &Service{
-		URL: url.URL{
-			Scheme: os.Getenv("SECURITY_SERVICE_SCHEME"),
-			Host:   os.Getenv("SECURITY_SERVICE_HOST"),
-		},
-		Header: make(http.Header),
+		Service: *msp.NewService(msp.Config{
+			Name:      "security",
+			UserToken: config.UserToken,
+			Values:    config.Values,
+			Header:    config.Header,
+		}),
 	}
-	// default microservice required headers
-	(*s).Header.Set("Content-Type", "application/json")
-	(*s).Header.Set("X-User-Token", token)
 
 	return s
-}
-
-// SetURL sets the URL for the Security MicroService to point to
-// the microservice. SetURL is also the interface function that makes it a
-// mock service
-func (s *Service) SetURL(sc string, h string) {
-	s.URL.Scheme = sc
-	s.URL.Host = h
-}
-
-// SetEnv set the current service scheme and host as environmental variables.
-//
-// Mostly used for testing when the Env Vars need to be set dynamically when
-// service instances need to be mocked in tests
-func (s *Service) SetEnv() error {
-	err := os.Setenv("SECURITY_SERVICE_SCHEME", s.URL.Scheme)
-	if err != nil {
-		return err
-	}
-	err = os.Setenv("SECURITY_SERVICE_HOST", s.URL.Host)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // NewRequest consistently maps and executes requests to the security service

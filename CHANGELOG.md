@@ -5,6 +5,14 @@ The format is based on [Keep a changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.7.0] - 2023-08-16
+### Added
+- The `Config` type which allows default query values, headers, user token and
+  API keys to be set.
+
+### Updated
+- The `micro` package to `v0.2.0`.
+
 ## [0.6.0] - 2023-04-22
 ### Added
 - Added a `VerifyEmail` HTTP exchange method to verify a user's email address.
