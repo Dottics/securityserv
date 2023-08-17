@@ -13,15 +13,13 @@ import (
 // Service is the shorthand for the integration to the Security MicroService
 type Service struct {
 	msp.Service
-	//Header http.Header
-	//URL    url.URL
 }
 
 type Config struct {
 	UserToken string
-	APIKey    string
-	Header    http.Header
-	Values    url.Values
+	// APIKey    string // for now we will not allow this usage
+	Header http.Header
+	Values url.Values
 }
 
 func NewService(config Config) *Service {
@@ -29,7 +27,6 @@ func NewService(config Config) *Service {
 		Service: *msp.NewService(msp.Config{
 			Name:      "security",
 			UserToken: config.UserToken,
-			APIKey:    config.APIKey,
 			Values:    config.Values,
 			Header:    config.Header,
 		}),
