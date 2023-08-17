@@ -14,7 +14,7 @@ import (
 
 func TestNewService(t *testing.T) {
 	// Test without a token
-	s1 := NewService("")
+	s1 := NewService(Config{})
 	x11 := s1.Header.Get("X-User-Token")
 	if x11 != "" {
 		t.Errorf("expected '%v' got '%v'", "", x11)
@@ -25,7 +25,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	// Test with a token
-	s2 := NewService("my secret token")
+	s2 := NewService(Config{UserToken: "my secret token"})
 	x21 := s2.Header.Get("X-User-Token")
 	if x21 != "my secret token" {
 		t.Errorf("expected '%v' got '%v'", "my secret token", x21)
@@ -47,7 +47,7 @@ func TestNewService_2(t *testing.T) {
 	}
 
 	// Test without a token
-	s1 := NewService("")
+	s1 := NewService(Config{})
 	if s1.URL.Scheme != "https" {
 		t.Errorf("expected '%v' got '%v'", "https", s1.URL.Scheme)
 	}
@@ -64,7 +64,7 @@ func TestNewService_2(t *testing.T) {
 	}
 
 	// Test with a token
-	s2 := NewService("my secret token")
+	s2 := NewService(Config{UserToken: "my secret token"})
 	if s2.URL.Scheme != "https" {
 		t.Errorf("expected '%v' got '%v'", "https", s2.URL.Scheme)
 	}
@@ -101,12 +101,9 @@ func TestService_SetURL(t *testing.T) {
 }
 
 func TestService_SetEnv(t *testing.T) {
-	s := Service{
-		URL: url.URL{
-			Scheme: "http",
-			Host:   "test.dottics.com",
-		},
-	}
+	s := NewService(Config{})
+	s.URL.Host = "test.dottics.com"
+	s.URL.Scheme = "http"
 	err := s.SetEnv()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err.Error())
@@ -126,7 +123,7 @@ func TestService_SetEnv(t *testing.T) {
 // successful request to the microservice.
 func TestService_NewRequest(t *testing.T) {
 	// test the request is made to the service
-	s := NewService("my test token")
+	s := NewService(Config{UserToken: "my test token"})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -200,7 +197,7 @@ func TestService_decode(t *testing.T) {
 		Name string `json:"name"`
 	}{}
 
-	s := NewService("")
+	s := NewService(Config{})
 	xb, e := s.decode(res, &b)
 	if e != nil {
 		t.Errorf("unexpected error: %v", e)
@@ -226,7 +223,7 @@ func TestService_decode_error(t *testing.T) {
 		Name int `json:"name"`
 	}{}
 
-	s := NewService("")
+	s := NewService(Config{})
 	xb, e := s.decode(res, &b)
 
 	errMessage := "map[marshal:[json: cannot unmarshal string into Go struct field .name of type int]]"
@@ -275,7 +272,7 @@ func TestService_GetHome(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 

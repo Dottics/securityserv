@@ -153,7 +153,7 @@ func TestService_Login(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -246,7 +246,7 @@ func TestService_Logout(t *testing.T) {
 	}
 
 	token := "my-very-secure-token"
-	s := NewService(token)
+	s := NewService(Config{UserToken: token})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -321,7 +321,7 @@ func TestService_PasswordResetToken(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -408,7 +408,7 @@ func TestService_ResetPassword(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -463,7 +463,7 @@ func TestService_RevokePasswordResetToken(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -583,7 +583,7 @@ func TestService_Register(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
@@ -650,7 +650,7 @@ func TestService_VerifyEmail(t *testing.T) {
 		},
 	}
 
-	s := NewService("")
+	s := NewService(Config{})
 	ms := microtest.MockServer(s)
 	defer ms.Server.Close()
 
